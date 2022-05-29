@@ -4,6 +4,8 @@ on: [workflow_dispatch, push, pull_request]
 
 defaults:
   run:
+    # Windows では Git for Windows の bash が使用される。
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell
     shell: bash
 
 jobs:
@@ -22,8 +24,29 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cache Build Directory
+        uses: actions/cache@v3
+        with:
+          path: |
+            Build
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ env.github_refname }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-${{ env.github_refname }}
+            ${{ runner.os }}-${{ runner.arch }}
+
       - name: Configure
-        run: cmake -B build .
+        run: |
+          set +e
+          cmake -B Build .
+          EXIT_CODE=$?
+          set -e
+          echo "========================================="
+          # 復元したキャッシュの状態が期待どおりでなくて Configure に失敗した場合は、
+          # ビルドディレクトリを削除して再実行してみる。
+          if [[ "${EXIT_CODE}" -eq 0 ]]; then
+            rm -rf Build
+            cmake -B Build
+          fi
 
       - name: Build
         run: cmake --build Build
