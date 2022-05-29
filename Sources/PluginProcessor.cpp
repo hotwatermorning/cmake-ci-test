@@ -14,7 +14,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        )
 {
-    std::cout << "Hello World." << std::endl;
+    std::cout << "Hello World2." << std::endl;
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
