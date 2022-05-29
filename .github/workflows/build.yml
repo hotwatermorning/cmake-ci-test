@@ -43,7 +43,7 @@ jobs:
           echo "========================================="
           # 復元したキャッシュの状態が期待どおりでなくて Configure に失敗した場合は、
           # ビルドディレクトリを削除して再実行してみる。
-          if [[ "${EXIT_CODE}" -eq 0 ]]; then
+          if [[ "${EXIT_CODE}" -ne 0 ]]; then
             rm -rf Build
             cmake -B Build
           fi
